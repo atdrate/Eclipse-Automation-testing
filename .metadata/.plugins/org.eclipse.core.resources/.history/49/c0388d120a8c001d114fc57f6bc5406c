@@ -1,0 +1,42 @@
+package com.bridgelabz.qa.api_automation;
+
+import org.testng.annotations.Test;
+
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+
+public class Json_Server_Api_Automation_Test {
+	
+	@Test
+	public void get_All_Post() {
+		Response response = RestAssured.get("http://localhost:3000/posts");
+		System.out.println("Response code: " +response.getStatusCode());
+		//JsonPath jsonPath = response.jsonPath();
+		//System.out.println("id: "+jsonPath.getInt("id[1]"));
+		response.prettyPrint();	
+	}
+
+	@Test
+	public void get_Specific_Post() {
+		Response response = RestAssured.get("http://localhost:3000/posts/2");
+		System.out.println("Response code: " +response.getStatusCode());
+		response.prettyPrint();	
+	}
+	
+	@Test
+	public void create_Post() {
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				//.accept(ContentType.JSON)
+				.body("{\n"
+						+" \"id\": 8,\n"
+						+" \"title\":Seventh comment,\n"
+						+" \"author\":subodh\n"
+						+"}")
+				.post("http://localhost:3000/posts");
+		response.prettyPrint();
+		
+	}
+
+}

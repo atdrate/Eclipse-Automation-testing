@@ -1,0 +1,57 @@
+package com.bridgelabz.qa.api_automation;
+
+import org.json.simple.JSONObject;
+import org.testng.annotations.Test;
+
+import io.restassured.RestAssured;
+
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+
+public class Json_Server_Api_Automation_Test {
+	
+	@Test
+	public void get_All_Post() {
+		Response response = RestAssured.get("http://localhost:3000/posts");
+		System.out.println("Response code: " +response.getStatusCode());
+		//JsonPath jsonPath = response.jsonPath();
+		//System.out.println("id: "+jsonPath.getInt("id[1]"));
+		response.prettyPrint();	
+	}
+
+	@Test
+	public void get_Specific_Post() {
+		Response response = RestAssured.get("http://localhost:3000/posts/2");
+		System.out.println("Response code: " +response.getStatusCode());
+		response.prettyPrint();	
+	}
+	
+	@Test
+	public void create_Post() {
+	RequestSpecification requestSpecification = RestAssured.given();
+	requestSpecification.header("Content-Type","application/json");
+	JSONObject json = new JSONObject();
+	json.put("id", 7);
+	json.put("title", "seventh post");
+	json.put("author", "cqa");
+	requestSpecification.body(json.toJSONString());
+	Response response = requestSpecification.post("http://localhost:3000/posts");
+	System.out.println("Response code : " +response.getStatusCode());
+	response.prettyPrint();	
+	}
+	
+	@Test
+	public void put_Update_Post() {
+	RequestSpecification requestSpecification = RestAssured.given();
+	requestSpecification.header("Content-Type","application/json");
+	JSONObject json = new JSONObject();
+	json.put("id", 7);
+	//json.put("title", "seventh updated post");
+	json.put("author", "cqa");
+	requestSpecification.body(json.toJSONString());
+	Response response = requestSpecification.put("http://localhost:3000/posts/7");
+	System.out.println("Response code : " +response.getStatusCode());
+	response.prettyPrint();	
+	}
+
+}

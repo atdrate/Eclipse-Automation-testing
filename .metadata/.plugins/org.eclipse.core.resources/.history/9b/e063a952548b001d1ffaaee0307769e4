@@ -1,0 +1,20 @@
+package com.bridgelabz.qa.api_automation;
+
+import org.testng.annotations.Test;
+
+import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
+
+public class Json_Server_Api_Automation_Test {
+	
+	@Test
+	public void get_All_Post() {
+		Response response = RestAssured.get("http://localhost:3000/posts/1");
+		System.out.println("Response code: " +response.getStatusCode());
+		JsonPath jsonPath = response.jsonPath();
+		System.out.println("id: "+jsonPath.getInt("id[1]"));
+		response.prettyPrint();	
+	}
+
+}

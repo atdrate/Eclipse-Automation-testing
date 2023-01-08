@@ -1,0 +1,283 @@
+package com.bridgelabz.qa.api_automation;
+
+
+import org.testng.Assert;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+
+public class Rest_Api_Automation_testing_Test {	
+	String token;
+	String userId;
+	String playlistId;
+	String trackId="4iV5W9uYEdYUVa79Axb7Rh";
+	@BeforeTest
+	public void getToken() {
+		token="Bearer BQD9QssvauZwC_J0OkjVQPd8ErT0fCnHaivBNcprV4RaWJuC-9PSWcCQvJ3IbE5WJdFUDtYFwBpufWKCTAFJeTjSqXdcB8A910DBVvz6LgkA-QhKokMwy6yCfba3DS4h5NGzrWOAo5oR8JSsI2sszMnU7lQnvE5a6VP2stq63YbrBF-SXOIVwmS-fzhFs-ez5Ib-pfvAj_MLTNZaP806l9kZqTy7IS3sKRZgYeynypTvKIfir3T2BtbweexKyLr9txZ5h1a9Ki9MYwkd";
+	}
+	
+	@Test(priority = 1)
+	public void get_Current_User_Profile() {
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.header("Authorization",token)
+				.when()
+				.get("https://api.spotify.com/v1/me");
+		response.prettyPrint();
+		response.then().assertThat().statusCode(200);
+		userId=response.path("id");
+		System.out.println("Current user id is:" +userId);
+		Assert.assertEquals("31cvvjacol64jjcy2lisrjwsxqe4", userId);	
+	}
+	
+	@Test(priority = 2)
+	public void get_Users_Profile() {
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.header("Authorization",token)
+				.when()
+				.get("https://api.spotify.com/v1/users/"+userId+"");
+		response.prettyPrint();
+		response.then().assertThat().statusCode(200);
+	}
+	
+	@Test(priority = 3)
+	public void create_Playlist() {
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.header("Authorization",token)
+				.body("{\r\n"
+						+" \"name\": \"CQA-113-6-Automation playlist\",\r\n"
+						+" \"description\":\"New playlist description\",\r\n"
+						+" \"public\":false\r\n"
+						+"}")
+				.when()
+				.post("https://api.spotify.com/v1/users/"+userId+"/playlists");
+		response.then().assertThat().statusCode(201);
+		playlistId=response.path("id");
+		System.out.println("Current user playlist id is:" +playlistId);
+		response.prettyPrint();	
+	}
+	
+	@Test(priority = 5)
+	public void add_Item_To_Playlist() {
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.header("Authorization",token)
+			    .queryParam("uris", "spotify:track:4Wn8Rbasv6gwEk6a6WBCyW,spotify:track:4370odM95PErS5m77VIIuO,spotify:track:22E10GNgQbuGzAC9vAMgo9")
+				.when()
+				.post("https://api.spotify.com/v1/playlists/"+playlistId+"/tracks");
+		response.prettyPrint();		
+		response.then().assertThat().statusCode(201);
+	}
+	
+	@Test(priority = 6)
+	public void get_Current_Users_Playlists() {
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.header("Authorization",token)
+				.queryParam("limit", "2")
+				.when()
+				.get("https://api.spotify.com/v1/me/playlists");
+		response.prettyPrint();
+		response.then().assertThat().statusCode(200);
+	}
+	
+	@Test(priority = 7)
+	public void get_Playlist_Item() {
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.header("Authorization",token)
+				.queryParam("limit", "2")
+				.when()
+				.get("https://api.spotify.com/v1/playlists/"+playlistId+"/tracks");
+		response.then().assertThat().statusCode(200);
+		response.prettyPrint();
+		
+	}
+	
+	@Test(priority = 8)
+	public void get_Playlist() {
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.header("Authorization",token)
+				.queryParam("limit", "2")
+				.when()
+				.get("https://api.spotify.com/v1/playlists/"+playlistId+"");
+		response.prettyPrint();
+		response.then().assertThat().statusCode(200);
+	}
+	
+	@Test(priority = 9)
+	public void get_Users_Playlist() {
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.header("Authorization",token)
+				.queryParam("limit", "2")
+				.when()
+				.get("https://api.spotify.com/v1/users/"+userId+"/playlists");
+		response.prettyPrint();
+		response.then().assertThat().statusCode(200);
+	}
+	
+    @Test(priority = 10)
+	public void update_Playlist_Item() {
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.header("Authorization",token)
+				.body("{\n"
+						+" \"range_start\": 1,\n"
+						+" \"insert_before\":3,\n"
+						+" \"range_length\":2\n"
+						+"}")
+				.when()
+				.put("https://api.spotify.com/v1/playlists/"+playlistId+"/tracks");
+		response.then().assertThat().statusCode(200);
+		response.prettyPrint();	
+	}
+
+    @Test(priority = 11)
+    public void get_Playlist_Cover_Image() {
+	Response response = RestAssured.given()
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+			.header("Authorization",token)
+			.when()
+			.get("https://api.spotify.com/v1/playlists/"+playlistId+"/images");
+	response.prettyPrint();
+	response.then().assertThat().statusCode(200);
+   }
+
+    @Test(priority = 12)
+  public void change_Playlist_Detail() {
+	Response response = RestAssured.given()
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+			.header("Authorization",token)
+			.body("{\r\n"
+					+" \"name\": \"Updated-4-CQA-113-Automation playlist\",\r\n"
+					+" \"description\":\"updated playlist description\",\r\n"
+					+" \"public\":false\r\n"
+					+"}")
+			.when()
+			.put("https://api.spotify.com/v1/playlists/"+playlistId+"");
+	response.prettyPrint();	
+   }
+	
+    @Test(priority = 4)
+	public void search_For_Item() {
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.header("Authorization",token)
+//				.queryParam("q", "arjit singh")
+//				.queryParam("type", "artist")
+				.pathParam("q", "arjit singh")
+				.pathParam("type", "track")
+				.queryParam("limit", "2")
+				.when()
+	       	//.get("https://api.spotify.com/v1/search");
+				.get("https://api.spotify.com/v1/search?q={q}&type={type}");
+		response.prettyPrint();	
+		response.then().assertThat().statusCode(200);
+	}
+
+	@Test(priority = 13)
+	public void get_Tracks_Audio_Analyses() {
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.header("Authorization",token)
+				.when()
+				.get("https://api.spotify.com/v1/audio-analysis/"+trackId+"");
+		response.prettyPrint();
+		response.then().assertThat().statusCode(200);
+	}
+
+	@Test(priority = 14)
+	public void get_Tracks_Audio_Features() {
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.header("Authorization",token)
+				.queryParam("ids", trackId)
+				.when()
+				.get("https://api.spotify.com/v1/audio-features");
+		response.prettyPrint();
+		response.then().assertThat().statusCode(200);
+	}
+	
+	@Test(priority = 15)
+	public void get_Tracks_Audio_Features_By_Id() {
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.header("Authorization",token)
+				.when()
+				.get("https://api.spotify.com/v1/audio-features/"+trackId+"");
+		response.prettyPrint();
+		response.then().assertThat().statusCode(200);
+	}
+	
+	@Test(priority = 16)
+	public void get_Several_Tracks() {
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.header("Authorization",token)
+				.queryParam("ids", trackId)
+				.queryParam("ids", "0yCWDaAgOtg6TKlNCg9rwA")
+				.when()
+				.get("https://api.spotify.com/v1/tracks");
+		response.prettyPrint();
+		response.then().assertThat().statusCode(200);
+	}
+	
+	@Test(priority = 17)
+	public void get_Tracks() {
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.header("Authorization",token)
+				.when()
+				.get("https://api.spotify.com/v1/tracks/"+trackId+"");
+		response.prettyPrint();
+		response.then().assertThat().statusCode(200);
+	}
+	
+	@Test(priority = 18)
+	public void remove_Playlist_Item() {
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.header("Authorization",token)
+				 .body("{\n"
+	                        + "    \"tracks\": [\n"
+	                        + "        {\n"
+	                        + "            \"uri\": \"spotify:track:4Wn8Rbasv6gwEk6a6WBCyW\",\n"
+	                        + "            \"positions\": [0]\n"
+	                        + "        }\n"
+	                        + "        \n"
+	                        + "    ]\n"
+	                        + "}")
+				.when()
+				.delete("https://api.spotify.com/v1/playlists/"+playlistId+"/tracks");
+		response.prettyPrint();
+		response.then().assertThat().statusCode(200);
+	}
+	
+	
+	
+}

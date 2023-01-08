@@ -1,0 +1,11 @@
+package com.bridgelabz.qa.api_automation;
+
+import org.testng.annotations.BeforeTest;
+
+public class Rest_Api_Automation_testing_Test {
+	
+	String token;
+	@BeforeTest
+	public void getToken
+
+}
